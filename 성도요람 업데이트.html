@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>개인정보 입력 폼</title>
+
+  <!-- 모바일 최적화 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    /* 전체 배경 및 기본 폰트 */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    /* 가운데 카드 형태 컨테이너 */
+    .container {
+      max-width: 480px;          /* 모바일 기준, 너무 넓지 않게 */
+      margin: 20px auto;
+      padding: 20px 16px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      margin-top: 0;
+      margin-bottom: 16px;
+      text-align: center;
+      color: #333;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 4px;
+      color: #444;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="date"],
+    textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #4a90e2;
+      box-shadow: 0 0 0 2px rgba(74,144,226,0.2);
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      background-color: #4a90e2;
+      color: #fff;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+
+    button:active {
+      transform: scale(0.99);
+    }
+
+    .result {
+      margin-top: 12px;
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .success {
+      color: #1b8c3f;
+    }
+
+    .error {
+      color: #d9534f;
+    }
+
+    .small {
+      font-size: 0.8rem;
+      color: #888;
+      margin-top: 6px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>개인정보 입력</h1>
+
+    <form id="infoForm">
+      <!-- header_row: 시트 헤더가 1행이면 그대로 1 -->
+      <input type="hidden" name="header_row" value="1">
+
+      <div class="field">
+        <label for="mokjang">목장</label>
+        <input type="text" id="mokjang" name="목장" required>
+      </div>
+
+      <div class="field">
+        <label for="name">이름</label>
+        <input type="text" id="name" name="이름" required>
+      </div>
+
+      <div class="field">
+        <label for="phone">전화번호</label>
+        <input type="text" id="phone" name="전화번호">
+      </div>
+
+      <div class="field">
+        <label for="address">주소</label>
+        <input type="text" id="address" name="주소">
+      </div>
+
+      <div class="field">
+        <label for="email">이메일</label>
+        <input type="email" id="email" name="이메일">
+      </div>
+
+      <div class="field">
+        <label for="birth">생년월일</label>
+        <input type="date" id="birth" name="생년월일">
+      </div>
+
+      <div class="field">
+  <label>가족 구성원</label>
+
+  <div id="familyList">
+    <div class="family-row">
+      <input type="text" name="가족이름[]" placeholder="이름" class="family-input">
+      <input type="text" name="가족관계[]" placeholder="관계(예: 어머니, 아버지, 아들)" class="family-input">
+    </div>
+  </div>
+
+  <button type="button" id="addFamily" class="small-button">+ 구성원 추가</button>
+</div>
+
+      <button type="submit" id="submitBtn">제출하기</button>
+
+      <div id="result" class="result"></div>
+      <div class="small">모든 정보가 올바른지 다시 한번 확인해주세요.</div>
+    </form>
+  </div>
+
+  <script>
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyJZnBw347ON44_mY0VZtdXyS50-v3JB4N215ZjBCEsVOZpBrbhDiqGivCZEpgZiW07/exec";
+
+    const form = document.getElementById('infoForm');
+    const resultEl = document.getElementById('result');
+    const submitBtn = document.getElementById('submitBtn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault(); // 페이지 이동 막기
+
+      // 버튼 상태 변경
+      submitBtn.disabled = true;
+      submitBtn.textContent = "전송 중...";
+
+      // 이전 메시지 지우기
+      resultEl.textContent = "";
+      resultEl.className = "result";
+
+      try {
+        // 폼 데이터 읽기
+        const formData = new FormData(form);
+
+        // Google Apps Script 웹앱은 URLSearchParams 방식도 잘 받습니다.
+        const params = new URLSearchParams();
+        for (const [key, value] of formData.entries()) {
+          params.append(key, value);
+        }
+
+        // CORS 문제를 피하기 위해 no-cors 사용
+        await fetch(WEB_APP_URL, {
+          method: "POST",
+          body: params,
+          mode: "no-cors"
+        });
+
+        // 여기까지 에러 없이 오면 "전송 시도"는 성공
+        resultEl.textContent = "성공적으로 제출되었습니다!";
+        resultEl.classList.add("success");
+
+        // 폼 비우기
+        form.reset();
+
+      } catch (error) {
+        console.error(error);
+        resultEl.textContent = "전송 중 오류가 발생했습니다. 다시 시도해 주세요.";
+        resultEl.classList.add("error");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "제출하기";
+      }
+    });
+  </script>
+</body>
+</html>
