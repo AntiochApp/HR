@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <title>개인정보 입력 폼</title>
+  <title>성도 등록</title>
 
   <!-- 모바일 최적화 -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -100,6 +100,22 @@
       margin-top: 6px;
       text-align: center;
     }
+
+    /* ✅ 가족 구성원 영역 스타일 추가 */
+    .family-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .family-input {
+      flex: 1;
+    }
+
+    .small-button {
+      background-color: #4a90e2;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 <body>
@@ -140,18 +156,19 @@
         <input type="date" id="birth" name="생년월일">
       </div>
 
+      <!-- ✅ 가족 구성원 영역 -->
       <div class="field">
-  <label>가족 구성원</label>
+        <label>가족 구성원</label>
 
-  <div id="familyList">
-    <div class="family-row">
-      <input type="text" name="가족이름[]" placeholder="이름" class="family-input">
-      <input type="text" name="가족관계[]" placeholder="관계(예: 어머니, 아버지, 아들)" class="family-input">
-    </div>
-  </div>
+        <div id="familyList">
+          <div class="family-row">
+            <input type="text" name="가족이름[]" placeholder="이름" class="family-input">
+            <input type="text" name="가족관계[]" placeholder="관계(예: 어머니, 아버지, 아들)" class="family-input">
+          </div>
+        </div>
 
-  <button type="button" id="addFamily" class="small-button">+ 구성원 추가</button>
-</div>
+        <button type="button" id="addFamily" class="small-button">+ 구성원 추가</button>
+      </div>
 
       <button type="submit" id="submitBtn">제출하기</button>
 
@@ -161,12 +178,28 @@
   </div>
 
   <script>
-    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyJZnBw347ON44_mY0VZtdXyS50-v3JB4N215ZjBCEsVOZpBrbhDiqGivCZEpgZiW07/exec";
+    const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwx6UW00nGJrNL9D5tTXjrBNHdJiqgr9vmw2a8OVFjN-7ioIZrJCJ3luyRdNDJPkwo6Uw/exec";
 
     const form = document.getElementById('infoForm');
     const resultEl = document.getElementById('result');
     const submitBtn = document.getElementById('submitBtn');
 
+    // ✅ 가족 구성원 추가 관련 요소
+    const addFamilyBtn = document.getElementById('addFamily');
+    const familyList = document.getElementById('familyList');
+
+    // ✅ "+ 구성원 추가" 눌렀을 때 새로운 입력칸 추가
+    addFamilyBtn.addEventListener('click', () => {
+      const row = document.createElement('div');
+      row.className = 'family-row';
+      row.innerHTML = `
+        <input type="text" name="가족이름[]" placeholder="이름" class="family-input">
+        <input type="text" name="가족관계[]" placeholder="관계(예: 어머니, 아버지, 아들)" class="family-input">
+      `;
+      familyList.appendChild(row);
+    });
+
+    // ✅ 폼 제출
     form.addEventListener('submit', async (e) => {
       e.preventDefault(); // 페이지 이동 막기
 
